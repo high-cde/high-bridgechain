@@ -1,1 +1,0 @@
-/data/data/com.termux/files/home/System.zdos/projects/high-bridgechain/target/debug/librpc.rlib: /data/data/com.termux/files/home/System.zdos/projects/high-bridgechain/rpc/src/lib.rs /data/data/com.termux/files/home/System.zdos/projects/high-bridgechain/rpc/src/server.rs
