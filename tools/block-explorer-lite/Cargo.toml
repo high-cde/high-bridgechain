@@ -3,5 +3,6 @@ name = "block-explorer-lite"
 version = "0.1.0"
 edition = "2021"
 
-[dependencies]
-serde_json = { workspace = true }
+[[bin]]
+name = "block-explorer-lite"
+path = "src/main.rs"

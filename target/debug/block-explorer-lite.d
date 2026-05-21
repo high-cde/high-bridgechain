@@ -1,0 +1,1 @@
+/data/data/com.termux/files/home/System.zdos/projects/high-bridgechain/target/debug/block-explorer-lite: /data/data/com.termux/files/home/System.zdos/projects/high-bridgechain/tools/block-explorer-lite/src/main.rs
