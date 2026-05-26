@@ -1,21 +1,11 @@
-use crate::zlang_tokenizer::{Token};
+use crate::zlang_tokenizer::{Token, tokenize};
 
-#[derive(Debug)]
-pub enum ZAst {
-    Number(i64),
-    Add(Box<ZAst>, Box<ZAst>),
+pub struct ZAst {
+    pub tokens: Vec<Token>,
 }
 
-pub fn parse(tokens: &[Token]) -> Result<ZAst, String> {
-    if tokens.len() == 3 {
-        if let Token::Number(a) = tokens[0].clone() {
-            if let Token::Plus = tokens[1] {
-                if let Token::Number(b) = tokens[2].clone() {
-                    return Ok(ZAst::Add(Box::new(ZAst::Number(a)), Box::new(ZAst::Number(b))));
-                }
-            }
-        }
+pub fn parse(input: &str) -> ZAst {
+    ZAst {
+        tokens: tokenize(input),
     }
-
-    Err("parse error".into())
 }

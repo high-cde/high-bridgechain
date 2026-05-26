@@ -1,53 +1,65 @@
+use serde_json::json;
+use tiny_http::{Server, Response, Method};
 use std::sync::{Arc, Mutex};
-use serde_json::Value;
-use tiny_http::{Server, Response};
-
 use crate::state::State;
-use crate::vm::Vm;
 
-pub async fn start_rpc(addr: &str, state: Arc<Mutex<State>>) {
-    let server = Server::http(addr).unwrap();
-    println!("[RPC] Server attivo su {}", addr);
+pub async fn start_rpc(state: Arc<Mutex<State>>) {
+    let server = Server::http("0.0.0.0:8765").unwrap();
 
     for request in server.incoming_requests() {
-        let mut body = String::new();
-        request.as_reader().read_to_string(&mut body).unwrap();
+        let method = request.method().clone();
+        let path = request.url().to_string();
 
-        let json: Value = serde_json::from_str(&body).unwrap_or(Value::Null);
-        let method = json["method"].as_str().unwrap_or("");
-        let params = json["params"].clone();
+        let response = match (method, path.as_str()) {
 
-        let result = match method {
-            "vm_deploy" => {
-                let name = params["contract"].as_str().unwrap_or("");
-                let code = params["code"].as_str().unwrap_or("");
-                let mut vm = state.lock().unwrap().vm.lock().unwrap();
-                vm.deploy(name, code)
+            // Healthcheck
+            (Method::Get, "/ping") => {
+                json!({ "status": "ok" }).to_string()
             }
 
-            "vm_call" => {
-                let name = params["contract"].as_str().unwrap_or("");
-                let func = params["function"].as_str().unwrap_or("");
-                let args = params["args"].clone();
-                let mut vm = state.lock().unwrap().vm.lock().unwrap();
-                vm.call(name, func, args)
+            // Altezza del nodo
+            (Method::Get, "/height") => {
+                let st = state.lock().unwrap();
+                json!({ "height": st.height }).to_string()
             }
 
-            "vm_exec_zlang" => {
-                let code = params["code"].as_str().unwrap_or("");
-                let mut vm = state.lock().unwrap().vm.lock().unwrap();
-                vm.execute_zlang(code)
+            // Esecuzione codice Z‑Lang
+            (Method::Post, "/execute") => {
+                let body = request.as_reader();
+                let code = std::io::read_to_string(body).unwrap_or_default();
+
+                let st = state.lock().unwrap();
+                let result = st.vm.execute(&code);
+
+                json!({ "result": result.unwrap() }).to_string()
             }
 
-            _ => Err("unknown method".into()),
+            // Deploy contratto
+            (Method::Post, "/deploy") => {
+                let body = request.as_reader();
+                let payload = std::io::read_to_string(body).unwrap_or_default();
+
+                let st = state.lock().unwrap();
+                let result = st.vm.deploy("contract", &payload);
+
+                json!({ "deploy": result.unwrap() }).to_string()
+            }
+
+            // Call contratto
+            (Method::Post, "/call") => {
+                let body = request.as_reader();
+                let payload = std::io::read_to_string(body).unwrap_or_default();
+
+                let st = state.lock().unwrap();
+                let result = st.vm.call("contract", "method", vec![payload]);
+
+                json!({ "call": result.unwrap() }).to_string()
+            }
+
+            // Endpoint sconosciuto
+            _ => json!({ "error": "unknown endpoint" }).to_string(),
         };
 
-        let response = match result {
-            Ok(v) => json!({"status": "ok", "result": v}),
-            Err(e) => json!({"status": "error", "message": e}),
-        };
-
-        let resp = Response::from_string(response.to_string());
-        request.respond(resp).unwrap();
+        let _ = request.respond(Response::from_string(response));
     }
 }
