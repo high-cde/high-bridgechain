@@ -5,7 +5,6 @@ mod zlang_parser;
 mod rpc;
 
 use state::State;
-use vm::Vm;
 
 use std::sync::{Arc, Mutex};
 

@@ -6,7 +6,7 @@ use crate::state::State;
 pub async fn start_rpc(state: Arc<Mutex<State>>) {
     let server = Server::http("0.0.0.0:8765").unwrap();
 
-    for request in server.incoming_requests() {
+    for mut request in server.incoming_requests() {
         let method = request.method().clone();
         let path = request.url().to_string();
 

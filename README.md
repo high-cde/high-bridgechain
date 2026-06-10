@@ -6,7 +6,8 @@
 </p>
 
 <h1 align="center">🌉 HighBridgeChain</h1>
-<h3 align="center">A ZLang‑Native Blockchain for Deterministic, Persistent, Hardware‑Bridging Systems</h3>
+<h3 align="center">The First Official Blockchain Project of zdos</h3>
+<h4 align="center">A ZLang‑Native Blockchain for Deterministic, Persistent, Hardware‑Bridging Systems</h4>
 
 <p align="center">
   <a href="https://github.com/high-cde/high-bridgechain/actions">
@@ -27,7 +28,7 @@
 
 🇮🇹 Descrizione (Italiano)
 
-HighBridgeChain è una blockchain linguaggio‑centrica, costruita attorno a:
+HighBridgeChain è il **primo progetto blockchain ufficiale di zdos**, una blockchain linguaggio‑centrica costruita attorno a:
 
 - ZLang, linguaggio deterministico nativo  
 - BridgeZ, la Z‑Unit interna per fee, staking e reward  
